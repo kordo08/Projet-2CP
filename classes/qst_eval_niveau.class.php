@@ -1,0 +1,33 @@
+<?php 
+class qst_eval_niveau extends dbh
+{
+public function qst_evaluation(int $id_qst,string $reponse)
+ {
+$sql="SELECT * FROM questions WHERE id_quiz=?";
+$stmt=$this->connect()->prepare($sql);
+$stmt->execute([$id_qst]);
+$reponse_juste=$stmt->fetchAll();
+if(strcasecmp($reponse_juste[0]['reponse'], $reponse)==0)
+{
+$results['error']=false;
+$results['message']='Excellent!!';
+$this->addToNiveau($reponse_juste[0]['id_cours']);
+
+}
+else 
+{
+$results['error']=true;
+$results['message']="Pipiip c'est incorrect!! la reponse juste est :";
+$results['correction']=$reponse_juste[0]['reponse'];
+}
+return $results;
+}
+public function addToNiveau(int $id_cours)
+{
+
+$sql="UPDATE niveaux SET eval_niv=eval_niv+1 WHERE id_niveau=(SELECT(id_niveau)from themes where id_theme=(SELECT(id_theme)from cours where id_cours=?))";
+$stmt=$this->connect()->prepare($sql);
+$stmt->execute([$id_cours]);
+}
+}
+?>
