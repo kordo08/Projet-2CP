@@ -30,7 +30,8 @@ public function table_final(array $tab1,array $tab2,int $nbQstParType,string $ti
         if (!in_array($indice, $tableau1)) {
             $tableau1[] = $indice;
             $tabQst[$i]=$tab1[$indice]; 
-            $tabQst[$i]['choix']=NULL;     
+            $tabQst[$i]['choix_1']=NULL; 
+            $tabQst[$i]['choix_2']=NULL;     
                 $i++;
         }
     }
@@ -41,8 +42,19 @@ public function table_final(array $tab1,array $tab2,int $nbQstParType,string $ti
         if (!in_array($indice, $tableau2)) {
             $tableau2[] = $indice;
             $tabQst[$i]=$tab2[$indice];
-            $tabQst[$i]['choix']=$this->get_choices($titre_theme,$titre_cours,$tab2[$indice]['reponse']);          
+            $tab_choix=$this->get_choices($titre_theme,$titre_cours,$tab2[$indice]['reponse']);
+            if((strcasecmp($titre_theme,'circulation')==0) && strlen($tab2[$indice]['reponse'])==3)
+            {
+            $tabQst[$i]['choix_1']=$tab_choix[0];
+            $tabQst[$i]['choix_2']=NULL;   
+            }
+           else
+           {
+            $tabQst[$i]['choix_1']=$tab_choix[0];
+            $tabQst[$i]['choix_2']=$tab_choix[1]; 
+           }       
                 $i++;
+           
         }
     }
     $tableau_final=array_merge_recursive($tableau1,$tableau2);
@@ -54,7 +66,7 @@ public function get_choices(string $titre_theme,string $titre_cours,string $repo
 {
  if (strcasecmp($titre_theme,'signalisation')==0)
  {
-    $sql="SELECT * FROM plaques WHERE plaque !=? AND titre_cours=?";
+    $sql="SELECT * FROM plaques WHERE nom_plaque !=? AND titre_cours=?";
     $stmt=$this->connect()->prepare($sql);
     $stmt->execute([$reponse_juste,$titre_cours]);
     $tab=$stmt->fetchAll();   
@@ -90,7 +102,7 @@ public function get_choices(string $titre_theme,string $titre_cours,string $repo
      if (!in_array($indice, $tableau)) {
          $tableau[] = $indice;
          if (strcasecmp($titre_theme,'signalisation')==0)
-         {$tabChoix[$i]=$tab[$indice]['plaque'];}
+         {$tabChoix[$i]=$tab[$indice]['nom_plaque'];}
          else
          {$tabChoix[$i]=$tab[$indice]['choix'];}          
              $i++;

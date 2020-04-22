@@ -2,7 +2,7 @@
 declare (strict_types = 1);
 include 'AutoLoader.inc.php';
 
-if (!empty($_POST))
+if (isset($_POST))
 {
 if (!empty($_POST['titre_cours']))
  {
